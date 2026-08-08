@@ -53,11 +53,11 @@ several mixins, each covering a clearly defined area of responsibility:
 +-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
 | ``dll_introspection_mixin.py``| Loading the DLL via ``ctypes``, reading ``Model_GetInfo()``, checking the API version, and building the input/output/parameter lists.                     |
 +-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
-| ``fortran_codegen_mixin.py``  | Generation of the ``<dll_name>_FINTERFACE_PSCAD.f90`` wrapper (pure text generation, no GUI/DLL calls).                                                    |
+| ``fortran_codegen_mixin.py``  | Generation of the ``<dll_name>_FINTERFACE_PSCAD.f90`` wrapper (pure text generation, no GUI/DLL calls).                                                   |
 +-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
-| ``pscad_project_mixin.py``    | Creation/update of the PSCAD project and component via the ``mhi.pscad`` API (ports, mask, graphics, Fortran script, resource).                            |
+| ``pscad_project_mixin.py``    | Creation/update of the PSCAD project and component via the ``mhi.pscad`` API (ports, mask, graphics, Fortran script, resource).                           |
 +-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
-| ``IEC_DLLInterface.py``       | ``ctypes`` mapping of the C structures from ``ext_simenv_capi.h``.                                                                                         |
+| ``IEC_DLLInterface.py``       | ``ctypes`` mapping of the C structures from ``ext_simenv_capi.h``.                                                                                        |
 +-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 ******************************************
@@ -74,7 +74,7 @@ The tool is started via `IEC_DLL_PSCAD_Import_Tool.py` or the exectuable which c
 and opens a simple graphical window asking for your IEC DLL file path as well as the your choice building a new PSCAD model or 
 adding the DLL Block to an existing one. 
 
-..  figure:: images/Figure1.png
+..  figure:: ../images/Figure1.png
     :alt: Graphical User Interface of the PSCAD import tool.
 
     Graphical User Interface of the PSCAD import tool.
