@@ -68,8 +68,8 @@ The tool is started via `IEC_DLL_PSCAD_Import_Tool.py` or the exectuable which c
 
 ..  code-block:: bash
     :caption: Calling Pyinstaller for executable generation.
-
-   pyinstaller.exe --onefile --add-data "finterface_pscad.f90.tmpl;." .\IEC_DLL_PSCAD_Import_Tool.py
+    
+    pyinstaller.exe --onefile --add-data "finterface_pscad.f90.tmpl;." .\IEC_DLL_PSCAD_Import_Tool.py
 
 and opens a simple graphical window asking for your IEC DLL file path as well as the your choice building a new PSCAD model or 
 adding the DLL Block to an existing one. 
