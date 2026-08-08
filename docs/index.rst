@@ -42,23 +42,23 @@ workflow.
 The tool is implemented as a Tkinter GUI application and is divided into
 several mixins, each covering a clearly defined area of responsibility:
 
-+=============================+===========================================================================================================================================================+
-| Module                      | Responsibility                                                                                                                                            |
-+=============================+===========================================================================================================================================================+
-| `Application.py`            | Composition root: maintains the shared state (signal/parameter lists, GUI references) and orchestrates the workflow when clicking "Generate PSCAD Model". |
-+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `gui_mixin.py`              | Construction of the Tkinter widgets and their event handlers (radiobuttons, browse dialogs, placeholder texts, error/info messages).                      |
-+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `pscad_connection_mixin.py` | Connection to a running PSCAD-5.x instance, listing open projects, opening the project folder in Explorer.                                                |
-+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `dll_introspection_mixin.py`| Loading the DLL via `ctypes`, reading `Model_GetInfo()`, checking the API version, and building the input/output/parameter lists.                         |
-+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `fortran_codegen_mixin.py`  | Generation of the `<dll_name>_FINTERFACE_PSCAD.f90` wrapper (pure text generation, no GUI/DLL calls).                                                     |
-+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `pscad_project_mixin.py`    | Creation/update of the PSCAD project and component via the `mhi.pscad` API (ports, mask, graphics, Fortran script, resource).                             |
-+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `IEC_DLLInterface.py`       | `ctypes` mapping of the C structures from `ext_simenv_capi.h`.                                                                                            |
-+=============================+===========================================================================================================================================================+
++-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Module                        | Responsibility                                                                                                                                            |  
++===============================+===========================================================================================================================================================+
+| ``Application.py``            | Composition root: maintains the shared state (signal/parameter lists, GUI references) and orchestrates the workflow when clicking "Generate PSCAD Model". |
++-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``gui_mixin.py``              | Construction of the Tkinter widgets and their event handlers (radiobuttons, browse dialogs, placeholder texts, error/info messages).                      |
++-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``pscad_connection_mixin.py`` | Connection to a running PSCAD-5.x instance, listing open projects, opening the project folder in Explorer.                                                |
++-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``dll_introspection_mixin.py``| Loading the DLL via ``ctypes``, reading ``Model_GetInfo()``, checking the API version, and building the input/output/parameter lists.                     |
++-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``fortran_codegen_mixin.py`` | Generation of the ``<dll_name>_FINTERFACE_PSCAD.f90`` wrapper (pure text generation, no GUI/DLL calls).                                                    |
++-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``pscad_project_mixin.py``   | Creation/update of the PSCAD project and component via the ``mhi.pscad`` API (ports, mask, graphics, Fortran script, resource).                            |
++-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``IEC_DLLInterface.py``      | ``ctypes`` mapping of the C structures from ``ext_simenv_capi.h``.                                                                                         |
++-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 ******************************************
 # PSCAD Import Tool in Detail
