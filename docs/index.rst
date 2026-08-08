@@ -36,7 +36,7 @@ newer CIGRE-TB958 format. Both formats are very similar in structure and
 workflow.
 
 ******************************************
-# Architecture Overview
+Architecture Overview
 ******************************************
 
 The tool is implemented as a Tkinter GUI application and is divided into
@@ -53,52 +53,42 @@ several mixins, each covering a clearly defined area of responsibility:
 +-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
 | ``dll_introspection_mixin.py``| Loading the DLL via ``ctypes``, reading ``Model_GetInfo()``, checking the API version, and building the input/output/parameter lists.                     |
 +-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
-| ``fortran_codegen_mixin.py`` | Generation of the ``<dll_name>_FINTERFACE_PSCAD.f90`` wrapper (pure text generation, no GUI/DLL calls).                                                    |
+| ``fortran_codegen_mixin.py``  | Generation of the ``<dll_name>_FINTERFACE_PSCAD.f90`` wrapper (pure text generation, no GUI/DLL calls).                                                    |
 +-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
-| ``pscad_project_mixin.py``   | Creation/update of the PSCAD project and component via the ``mhi.pscad`` API (ports, mask, graphics, Fortran script, resource).                            |
+| ``pscad_project_mixin.py``    | Creation/update of the PSCAD project and component via the ``mhi.pscad`` API (ports, mask, graphics, Fortran script, resource).                            |
 +-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
-| ``IEC_DLLInterface.py``      | ``ctypes`` mapping of the C structures from ``ext_simenv_capi.h``.                                                                                         |
+| ``IEC_DLLInterface.py``       | ``ctypes`` mapping of the C structures from ``ext_simenv_capi.h``.                                                                                         |
 +-------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 ******************************************
-# PSCAD Import Tool in Detail
+PSCAD Import Tool in Detail
 ******************************************
 
-The tool is started via `IEC_DLL_PSCAD_Import_Tool.py` and opens a
-simple graphical window with the title::
+The tool is started via `IEC_DLL_PSCAD_Import_Tool.py` or the exectuable which can be build using pyinstaller by calling
 
-PSCAD Import Tool (IEC 61400-27 DLL format) FAU Erlangen-Nürnberg v3.0
+..  code-block:: bash
+    :caption: Calling Pyinstaller for executable generation.
 
-.. code-block:: text
+   pyinstaller.exe --onefile --add-data "finterface_pscad.f90.tmpl;." .\IEC_DLL_PSCAD_Import_Tool.py
 
-+----------------------------------------------------------------+
-| PSCAD Import Tool (IEC 61400-27 DLL format) FAU Erlangen v3.0  |
-+----------------------------------------------------------------+
-| DLL File Path      [______***********************]  [Browse]  |
-| (o) Create New Project                                        |
-|     Destination folder [***********************]  [Browse]    |
-| ( ) Use Available Project                                     |
-|     [Select an open PSCAD project        v]        [O] [F]    |
-|                                                                |
-|               [ Generate PSCAD Model ]                        |
-+----------------------------------------------------------------+
+and opens a simple graphical window asking for your IEC DLL file path as well as the your choice building a new PSCAD model or 
+adding the DLL Block to an existing one. 
 
-Graphical user interface layout (`GuiMixin.create_widgets`):
-DLL path row, the two mutually exclusive project options, and the
-"Generate PSCAD Model" button (`[O]` = refresh symbol, `[F]` =
-"Open project's location" symbol).
+..  figure:: images/Figure1.png
+    :alt: Graphical User Interface of the PSCAD import tool.
 
-## Prerequisites
+    Graphical User Interface of the PSCAD import tool.
+
+Prerequisites
+-------------
 
 * PSCAD version 5.x with a valid license.
-* Matching Intel Fortran compiler (32-bit or 64-bit version, depending
-  on the architecture of the DLL to be imported).
-* An IEC 61400-27 / Ext-SimEnv-compatible DLL with API release
-  `0.8.1.5` (checked in
-  `DllIntrospectionMixin.get_and_check_dll_interface_version()`; if the
-  version differs, the tool terminates with an error message).
+* Matching Intel Fortran compiler (32-bit or 64-bit version, depending on the architecture of the DLL to be imported).
+* An IEC 61400-27 / Ext-SimEnv-compatible DLL with API release `0.8.1.5` (checked in `DllIntrospectionMixin.get_and_check_dll_interface_version()`; 
+  if the version differs, the tool terminates with an error message).
 
-## Workflow
+Workflow
+--------
 
 The user first selects the DLL to be imported via the first "Browse" button.
 After clicking "Generate PSCAD Model", the tool performs the following steps
