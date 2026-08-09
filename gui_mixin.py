@@ -6,7 +6,6 @@ inline error/info labels in the window.
 """
 
 import tkinter as tk
-# ttk provides better rendering for label, entry etc. compared to tk
 from tkinter import filedialog, ttk
 
 
@@ -62,7 +61,7 @@ class GuiMixin:
                     self.pscad_projects_selected_value,
                     self.combobox_pscad_projects_placeholder)
 
-    def select_folder(self, entry):
+    def select_folder(self, entry: ttk.Entry):
         """Open a folder-picker dialog and write the result into ``entry``.
 
         Bound to the "Browse" button for the new-project destination
@@ -85,7 +84,8 @@ class GuiMixin:
         """Build the widget tree and display the GUI."""
         self.create_widgets()
 
-    def remove_placeholder(self, entry, placeholder_value):
+    @staticmethod
+    def remove_placeholder(entry: ttk.Entry, placeholder_value: str):
         """Clear ``entry`` if it currently shows its placeholder text.
 
         Bound to an entry's ``<FocusIn>`` event so the placeholder
@@ -100,7 +100,8 @@ class GuiMixin:
             entry.delete(0, tk.END)
             entry.config(foreground="black")
 
-    def display_placeholder(self, entry, placeholder_value):
+    @staticmethod
+    def display_placeholder(entry: ttk.Entry, placeholder_value: str):
         """Show ``placeholder_value`` in ``entry`` if it is left empty.
 
         Bound to an entry's ``<FocusOut>`` event.
@@ -114,8 +115,12 @@ class GuiMixin:
             entry.insert(0, placeholder_value)
             entry.config(foreground="gray")
 
+    @staticmethod
     def display_combobox_placeholder(
-            self, combobox, combobox_selected_value, placeholder_value):
+            combobox: ttk.Combobox,
+            combobox_selected_value: tk.StringVar,
+            placeholder_value: str
+    ):
         """Show ``placeholder_value`` in a combobox if nothing is selected.
 
         :param combobox: The ``ttk.Combobox`` widget.
@@ -131,8 +136,12 @@ class GuiMixin:
             combobox_selected_value.set(placeholder_value)
             combobox.config(foreground="gray")
 
+    @staticmethod
     def set_combobox_black_foreground(
-            self, combobox, combobox_selected_value, placeholder_value):
+            combobox: ttk.Combobox,
+            combobox_selected_value: tk.StringVar,
+            placeholder_value: str
+    ):
         """Switch a combobox's text back to black once it has a real value.
 
         Bound to a combobox's ``<FocusIn>`` event, and also called
@@ -354,7 +363,7 @@ class GuiMixin:
             label_info.destroy()
             self.row_index -= 1
 
-    def display_error(self, message):
+    def display_error(self, message: str):
         """Show ``message`` as a red, bold, dismissible error label.
 
         A no-op if ``message`` is empty/``None``. The label is
@@ -379,7 +388,7 @@ class GuiMixin:
         self.list_label_errors.append(label_message)
         self.row_index += 1
 
-    def display_info(self, message):
+    def display_info(self, message: str):
         """Show ``message`` as a green, bold, dismissible info label.
 
         A no-op if ``message`` is empty/``None``. The label is
@@ -401,7 +410,7 @@ class GuiMixin:
         self.list_label_info.append(label_message)
         self.row_index += 1
 
-    def open_file(self, entry, ext):
+    def open_file(self, entry: ttk.Entry, ext: str):
         """Prompt for a file with extension ``ext`` and fill ``entry``.
 
         Bound to the DLL "Browse" button. Leaves ``entry`` unchanged
@@ -415,7 +424,7 @@ class GuiMixin:
         :type ext: str
         """
         file = filedialog.askopenfile(
-            mode='r', filetypes=[('IEEE CIGRE DLL', '*' + ext)])
+            mode='r', filetypes=[('IEC 61400-27 DLL', '*' + ext)])
         if file:
             file_path = file.name
             entry.delete(0, 'end')  # clear text first

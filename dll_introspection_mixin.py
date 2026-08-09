@@ -56,19 +56,23 @@ class DllIntrospectionMixin:
         self.list_label_errors = []
         self.list_label_info = []
 
-    def remove_forbidden_char(self, name):
+    @staticmethod
+    def remove_forbidden_char(name: str) -> str:
         """Replace spaces in a signal/parameter name with underscores.
 
         :param name: Raw name as read from the DLL.
         :type name: str
 
-        :return: Sanitized name, safe to use as a Fortran/PSCAD identifier.
-        :rtype: str
+        :return: **name** (str) – Sanitized name, safe to use as a \
+            Fortran/PSCAD identifier.
         """
         name = name.replace(' ', '_')
         return name
 
-    def shorten_if_limit_exceeded(self, name, counter_for_long_names):
+    @staticmethod
+    def shorten_if_limit_exceeded(
+            name: str, counter_for_long_names: int
+    ) -> tuple[str, int]:
         """Shorten ``name`` to fit PSCAD's 31-character signal name limit.
 
         Names within the limit are returned unchanged. Names that are
@@ -84,8 +88,8 @@ class DllIntrospectionMixin:
             keep threading it through successive calls.
         :type counter_for_long_names: int
 
-        :return: ``(shortened_name, updated_counter)``.
-        :rtype: tuple[str, int]
+        :return: **(shortened_name, updated_counter)** (tuple[str, int]) – \
+            shortened name and long names counter .
         """
         if len(name) <= 31:
             return name, counter_for_long_names

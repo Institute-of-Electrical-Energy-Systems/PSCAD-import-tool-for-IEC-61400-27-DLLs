@@ -33,7 +33,7 @@ IEC_DLL_PSCAD_Import_Tool.py
 
 IEC_DLLInterface.py
 ^^^^^^^^^^^^^^^^^^^
-.. autoclass:: IEC_DLLInterface
+.. automodule:: IEC_DLLInterface
    :members:
    :show-inheritance:
 

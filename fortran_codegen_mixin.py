@@ -23,159 +23,6 @@ import os
 from string import Template
 
 
-def _indexed_pscad_name(name: str, suffix: str, j: int, width: int) -> str:
-    """
-        Build the PSCAD-side variable name for element ``j`` of a signal.
-
-        Shared by every generator below that walks a (possibly vector)
-        signal and needs the name of its j-th element on the PSCAD side.
-        Scalar signals (``width == 1``) get no index; vector signals get
-        either ``name(j)`` or, for the special ``_init_pscad`` suffix,
-        ``name_j_init_pscad`` (PSCAD declares those as separate scalar
-        arguments rather than as an array).
-
-        :param name: Base variable name.
-        :type name: str
-        :param suffix: PSCAD suffix (e.g. '_pscad', '_pscad_prev', \
-            '_init_pscad').
-        :type suffix: str
-        :param j: 1-based element index.
-        :type j: int
-        :param width: Total width of the signal.
-        :type width: int
-
-        :return: - **-** (str) – The element's PSCAD-side name.
-    """
-    if width == 1:
-        return name + suffix
-    if suffix == '_init_pscad':
-        return f'{name}_{j}{suffix}'
-    return f'{name}{suffix}({j})'
-
-
-def generate_type(type_name: str, names: list, fortran_types: list,
-                  widths=None) -> str:
-    """
-        Generate a Fortran TYPE definition.
-
-        Creates a Fortran derived type containing one member for each
-        variable in ``names``. If a variable width greater than one is
-        specified, the corresponding member is declared as an array.
-
-        :param type_name: Name of the generated Fortran type.
-        :type type_name: str
-        :param names: Member names.
-        :type names: list
-        :param fortran_types: Fortran data types of the members.
-        :type fortran_types: list
-        :param widths: Optional widths of the members.
-        :type widths: list
-
-        :return: - **buffer** (str) - Generated Fortran TYPE definition.
-    """
-    members = []
-    for i, name in enumerate(names):
-        width = widths[i] if widths is not None else 1
-        member = f'{fortran_types[i]} :: {name}'
-        if width > 1:
-            member += f'({width})'
-        members.append(member)
-
-    body = '\n\t\t'.join(members)
-    return f'\tTYPE {type_name}\n\t\t{body}\n\tEND TYPE'
-
-
-def generate_variables_declaration(
-        intent_value: str, var_names: list, var_suffix: str,
-        var_types: list, var_width: list = None):
-    """
-        Generate a block of Fortran variable declarations.
-
-        :param intent_value: INTENT qualifier (IN, OUT or '').
-        :type intent_value: str
-        :param var_names: Variable names.
-        :type var_names: list
-        :param var_suffix: Suffix appended to each variable name.
-        :type var_suffix: str
-        :param var_types: Fortran type of each variable.
-        :type var_types: list
-        :param var_width: Optional array widths.
-        :type var_width: list
-
-        :return: - **buffer** (str) – Fortran declaration block.
-    """
-    intent_str = f', INTENT({intent_value})' if intent_value else ''
-
-    buffer = ''
-    for i, name in enumerate(var_names):
-        width = var_width[i] if var_width is not None else 1
-        decl = f'\t{var_types[i]}{intent_str} :: {name}{var_suffix}'
-        if width > 1:
-            decl += f'({width})'
-        buffer += decl + '\n'
-    return buffer
-
-
-def generate_flat_array_to_storf_outputs(widths: list,
-                                         pscad_types: list,
-                                         array_name: str = 'ExtY',
-                                         indent: str = '\t') -> str:
-    """
-        Generate assignments from a flat output array to STORF.
-
-        Stores the current output values in STORF so they remain
-        available between PSCAD time steps.
-
-        :param widths: Output widths.
-        :type widths: list
-        :param pscad_types: PSCAD types.
-        :type pscad_types: list
-        :param array_name: Source flat array.
-        :type array_name: str
-        :param indent: Indentation used in the generated code.
-        :type indent: str
-
-        :return: - **buffer** (str) – Generated Fortran assignment code.
-    """
-    buffer = ''
-    idx = 0
-    for width, pscad_type in zip(widths, pscad_types):
-        if pscad_type == 'CHARACTER(*)':
-            continue
-        for _ in range(width):
-            buffer += (f'{indent}STORF(idx_start_outputs + {idx}) = '
-                       f'REAL({array_name}({idx + 1}), 8)\n')
-            idx += 1
-    return buffer
-
-
-def generate_storf_outputs_to_pscad(
-        names: list, widths: list, pscad_suffix: str, indent: str = '\t'
-) -> str:
-    """
-        Generate assignments from STORF back to PSCAD output variables.
-
-        :param names: Variable names.
-        :type names: list
-        :param widths: Variable widths.
-        :type widths: list
-        :param pscad_suffix: PSCAD variable suffix.
-        :type pscad_suffix: str
-        :param indent: Indentation used in the generated code.
-        :type indent: str
-
-        :return: - **buffer** (str) – Generated Fortran assignment code.
-    """
-    buffer = ''
-    idx = 0
-    for name, width in zip(names, widths):
-        for j in range(1, width + 1):
-            part1 = _indexed_pscad_name(name, pscad_suffix, j, width)
-            buffer += f'{indent}{part1} = STORF(idx_start_outputs + {idx})\n'
-            idx += 1
-    return buffer
-
-
 class FortranCodegenMixin:
     """Fortran wrapper source generation, mixed into Application.
 
@@ -193,6 +40,159 @@ class FortranCodegenMixin:
     ``Model_Info``.
     """
 
+    @staticmethod
+    def _indexed_pscad_name(name: str, suffix: str, j: int, width: int) -> str:
+        """
+            Build the PSCAD-side variable name for element ``j`` of a signal.
+
+            Shared by every generator below that walks a (possibly vector)
+            signal and needs the name of its j-th element on the PSCAD side.
+            Scalar signals (``width == 1``) get no index; vector signals get
+            either ``name(j)`` or, for the special ``_init_pscad`` suffix,
+            ``name_j_init_pscad`` (PSCAD declares those as separate scalar
+            arguments rather than as an array).
+
+            :param name: Base variable name.
+            :type name: str
+            :param suffix: PSCAD suffix (e.g. '_pscad', '_pscad_prev', \
+                '_init_pscad').
+            :type suffix: str
+            :param j: 1-based element index.
+            :type j: int
+            :param width: Total width of the signal.
+            :type width: int
+
+            :return: - **-** (str) – The element's PSCAD-side name.
+        """
+        if width == 1:
+            return name + suffix
+        if suffix == '_init_pscad':
+            return f'{name}_{j}{suffix}'
+        return f'{name}{suffix}({j})'
+
+    @staticmethod
+    def generate_type(type_name: str, names: list, fortran_types: list,
+                      widths=None) -> str:
+        """
+            Generate a Fortran TYPE definition.
+
+            Creates a Fortran derived type containing one member for each
+            variable in ``names``. If a variable width greater than one is
+            specified, the corresponding member is declared as an array.
+
+            :param type_name: Name of the generated Fortran type.
+            :type type_name: str
+            :param names: Member names.
+            :type names: list
+            :param fortran_types: Fortran data types of the members.
+            :type fortran_types: list
+            :param widths: Optional widths of the members.
+            :type widths: list
+
+            :return: - **buffer** (str) - Generated Fortran TYPE definition.
+        """
+        members = []
+        for i, name in enumerate(names):
+            width = widths[i] if widths is not None else 1
+            member = f'{fortran_types[i]} :: {name}'
+            if width > 1:
+                member += f'({width})'
+            members.append(member)
+
+        body = '\n\t\t'.join(members)
+        return f'\tTYPE {type_name}\n\t\t{body}\n\tEND TYPE'
+
+    @staticmethod
+    def generate_variables_declaration(
+            intent_value: str, var_names: list, var_suffix: str,
+            var_types: list, var_width: list = None):
+        """
+            Generate a block of Fortran variable declarations.
+
+            :param intent_value: INTENT qualifier (IN, OUT or '').
+            :type intent_value: str
+            :param var_names: Variable names.
+            :type var_names: list
+            :param var_suffix: Suffix appended to each variable name.
+            :type var_suffix: str
+            :param var_types: Fortran type of each variable.
+            :type var_types: list
+            :param var_width: Optional array widths.
+            :type var_width: list
+
+            :return: - **buffer** (str) – Fortran declaration block.
+        """
+        intent_str = f', INTENT({intent_value})' if intent_value else ''
+
+        buffer = ''
+        for i, name in enumerate(var_names):
+            width = var_width[i] if var_width is not None else 1
+            decl = f'\t{var_types[i]}{intent_str} :: {name}{var_suffix}'
+            if width > 1:
+                decl += f'({width})'
+            buffer += decl + '\n'
+        return buffer
+
+    @staticmethod
+    def generate_flat_array_to_storf_outputs(widths: list,
+                                             pscad_types: list,
+                                             array_name: str = 'ExtY',
+                                             indent: str = '\t') -> str:
+        """
+            Generate assignments from a flat output array to STORF.
+
+            Stores the current output values in STORF so they remain
+            available between PSCAD time steps.
+
+            :param widths: Output widths.
+            :type widths: list
+            :param pscad_types: PSCAD types.
+            :type pscad_types: list
+            :param array_name: Source flat array.
+            :type array_name: str
+            :param indent: Indentation used in the generated code.
+            :type indent: str
+
+            :return: - **buffer** (str) – Generated Fortran assignment code.
+        """
+        buffer = ''
+        idx = 0
+        for width, pscad_type in zip(widths, pscad_types):
+            if pscad_type == 'CHARACTER(*)':
+                continue
+            for _ in range(width):
+                buffer += (f'{indent}STORF(idx_start_outputs + {idx}) = '
+                           f'REAL({array_name}({idx + 1}), 8)\n')
+                idx += 1
+        return buffer
+
+    @staticmethod
+    def generate_storf_outputs_to_pscad(
+            names: list, widths: list, pscad_suffix: str, indent: str = '\t'
+    ) -> str:
+        """
+            Generate assignments from STORF back to PSCAD output variables.
+
+            :param names: Variable names.
+            :type names: list
+            :param widths: Variable widths.
+            :type widths: list
+            :param pscad_suffix: PSCAD variable suffix.
+            :type pscad_suffix: str
+            :param indent: Indentation used in the generated code.
+            :type indent: str
+
+            :return: - **buffer** (str) – Generated Fortran assignment code.
+        """
+        buffer = ''
+        idx = 0
+        for name, width in zip(names, widths):
+            for j in range(1, width + 1):
+                part1 = _indexed_pscad_name(name, pscad_suffix, j, width)
+                buffer += f'{indent}{part1} = STORF(idx_start_outputs + {idx})\n'
+                idx += 1
+        return buffer
+
     def generate_finterface_function_prototype(self) -> str:
         """
             Generate the Fortran wrapper subroutine prototype.
@@ -205,7 +205,7 @@ class FortranCodegenMixin:
             The argument list is wrapped after every five arguments for
             readability.
 
-            :return: Generated Fortran subroutine prototype.
+            :return: **-** (str) – Generated Fortran subroutine prototype.
         """
         dll_stem = self.dll_file_name[:-4]
 

@@ -20,8 +20,8 @@ class PscadConnectionMixin:
         since they cannot be selected as a destination for the
         generated component.
 
-        :return: Names of the open projects, as they appear in PSCAD.
-        :rtype: list[str]
+        :return: **project_names** (list[str]) – Names of the open \
+            projects, as they appear in PSCAD.
         """
         projects_list = self.pscad.projects()
         project_names = []
