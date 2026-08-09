@@ -64,7 +64,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./IEC_DLL_PSCAD_Import_Tool.exe
+          file: dist/IEC_DLL_PSCAD_Import_Tool.exe
           asset_name: IEC_DLL_PSCAD_Import_Tool.exe
           tag: IEC_DLL_PSCAD_Import_Tool
           overwrite: true
