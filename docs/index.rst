@@ -210,7 +210,7 @@ References
    :hidden:
    :caption: Usage
 
-   How_to_use
+   index
    API_documentation
 
 
