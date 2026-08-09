@@ -53,7 +53,9 @@ jobs:
       - name: Download WINDOWS artifact
         uses: actions/download-artifact@v5
         with:
-          name: IEC_DLL_PSCAD_Import_Tool
+          name: IEC_DLL_PSCAD_Import_Tool.exe
+          path: |
+            dist/IEC_DLL_PSCAD_Import_Tool.exe
   
       - name: Check downloaded files
         run: ls -la
