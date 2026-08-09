@@ -32,7 +32,7 @@ jobs:
             Scripts/pyinstaller.exe --onefile --add-data "finterface_pscad.f90.tmpl;." .\IEC_DLL_PSCAD_Import_Tool.py 
   
         - name: Upload Artifact
-          uses: actions/upload-artifact@v2
+          uses: actions/upload-artifact@v4
           with:
             name: IEC_DLL_PSCAD_Import_Tool.exe
             path: |
