@@ -29,11 +29,12 @@ as a corresponding PSCAD component/project with one input/output and
 parameter per DLL signal.
 
 .. note::
-This tool is inspired by the `PSCAD-import-tool-for-IEEE-CIGRE-DLLs <https://github.com/rte-france/PSCAD-import-tool-for-IEEE-CIGRE-DLLs>`_
-from the InterOPERA project (RTE / TU Delft), but targets the older,
-related **IEC 61400-27** format (API release `0.8.1.5`) rather than the
-newer CIGRE-TB958 format. Both formats are very similar in structure and
-workflow.
+
+    This tool is inspired by the `PSCAD-import-tool-for-IEEE-CIGRE-DLLs <https://github.com/rte-france/PSCAD-import-tool-for-IEEE-CIGRE-DLLs>`_
+    from the InterOPERA project (RTE / TU Delft), but targets the older,
+    related **IEC 61400-27** format (API release `0.8.1.5`) rather than the
+    newer CIGRE-TB958 format. Both formats are very similar in structure and
+    workflow.
 
 ******************************************
 Architecture Overview
