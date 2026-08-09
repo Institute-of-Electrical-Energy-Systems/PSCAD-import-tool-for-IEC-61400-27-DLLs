@@ -116,6 +116,7 @@ class Application(tk.Tk, GuiMixin, PscadConnectionMixin, DllIntrospectionMixin,
         self.param_group_names = []
         self.param_descriptions = []
         self.param_units = []
+     
         # int, kept in case Model_CheckParameters should only be called when
         # a parameter value has actually changed (not implemented yet)
         self.param_fixedValue = []
