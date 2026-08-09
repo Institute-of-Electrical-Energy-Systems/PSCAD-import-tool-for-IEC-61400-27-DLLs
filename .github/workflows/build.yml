@@ -10,7 +10,6 @@ jobs:
   windows:
       name: Build on windows
       runs-on: windows-latest
-      needs: [macos, linux]
       steps:
         - name: Checkout
           uses: actions/checkout@v3
@@ -18,10 +17,10 @@ jobs:
           uses: actions/setup-python@v4
           with:
             python-version: '3.13.5'
-
+  
         - name: Add msbuild to PATH
           uses: microsoft/setup-msbuild@v1.1
-
+  
         - name: Create Executable
           run: |
             python3 -m venv .
@@ -31,7 +30,7 @@ jobs:
             Scripts/pip3 install twisted[tls] appnope requests certifi
             Scripts/pip3 install -r requirements.txt
             Scripts/pyinstaller.exe --onefile --add-data "finterface_pscad.f90.tmpl;." .\IEC_DLL_PSCAD_Import_Tool.py 
-
+  
         - name: Upload Artifact
           uses: actions/upload-artifact@v2
           with:
@@ -42,7 +41,7 @@ jobs:
   deploy:
     name: Push builds
     runs-on: ubuntu-20.04
-    needs: [macos, linux, windows]
+    needs: [windows]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
