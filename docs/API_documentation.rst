@@ -2,7 +2,7 @@ Application
 ------------------------------
 Application.py
 ^^^^^^^^^^^^^^
-.. autoclass:: Application.Application
+.. automodule:: Application
    :members:
    :show-inheritance:
 
