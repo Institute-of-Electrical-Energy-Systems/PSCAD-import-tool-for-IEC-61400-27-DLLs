@@ -1,0 +1,66 @@
+name: Build Executables
+
+on:
+  push:
+    branches:
+      - master
+
+
+jobs:
+  windows:
+      name: Build on windows
+      runs-on: windows-latest
+      needs: [macos, linux]
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v3
+        - name: Setup Python
+          uses: actions/setup-python@v4
+          with:
+            python-version: '3.13.5'
+
+        - name: Add msbuild to PATH
+          uses: microsoft/setup-msbuild@v1.1
+
+        - name: Create Executable
+          run: |
+            python3 -m venv .
+            Scripts/activate.bat
+            Scripts/pip3 install --upgrade setuptools
+            Scripts/pip3 install pyinstaller
+            Scripts/pip3 install twisted[tls] appnope requests certifi
+            Scripts/pip3 install -r requirements.txt
+            Scripts/pyinstaller.exe --onefile --add-data "finterface_pscad.f90.tmpl;." .\IEC_DLL_PSCAD_Import_Tool.py 
+
+        - name: Upload Artifact
+          uses: actions/upload-artifact@v2
+          with:
+            name: IEC_DLL_PSCAD_Import_Tool.exe
+            path: |
+              dist/IEC_DLL_PSCAD_Import_Tool.exe
+
+  deploy:
+    name: Push builds
+    runs-on: ubuntu-20.04
+    needs: [macos, linux, windows]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Download WINDOWS artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: IEC_DLL_PSCAD_Import_Tool.exe
+
+      - name: GET VERSION
+        run: |
+          VERSION=$(python setup.py --version)
+          echo "VERSION=v$VERSION" >> $GITHUB_ENV
+
+      - name: Upload WINDOWS binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./IEC_DLL_PSCAD_Import_Tool.exe
+          asset_name: IEC_DLL_PSCAD_Import_Tool.exe
+          tag: IEC_DLL_PSCAD_Import_Tool
+          overwrite: true
