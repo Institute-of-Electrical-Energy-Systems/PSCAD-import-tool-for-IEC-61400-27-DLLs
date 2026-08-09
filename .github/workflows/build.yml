@@ -5,52 +5,58 @@ on:
     branches:
       - main
 
-
 jobs:
   windows:
-      name: Build on windows
-      runs-on: windows-latest
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v3
-        - name: Setup Python
-          uses: actions/setup-python@v4
-          with:
-            python-version: '3.13.5'
-  
-        - name: Add msbuild to PATH
-          uses: microsoft/setup-msbuild@v1.1
-  
-        - name: Create Executable
-          run: |
-            python3 -m venv .
-            Scripts/activate.bat
-            Scripts/pip3 install --upgrade setuptools
-            Scripts/pip3 install pyinstaller
-            Scripts/pip3 install twisted[tls] appnope requests certifi
-            Scripts/pip3 install -r requirements.txt
-            Scripts/pyinstaller.exe --onefile --add-data "finterface_pscad.f90.tmpl;." .\IEC_DLL_PSCAD_Import_Tool.py 
-  
-        - name: Upload Artifact
-          uses: actions/upload-artifact@v4
-          with:
-            name: IEC_DLL_PSCAD_Import_Tool.exe
-            path: |
-              dist/IEC_DLL_PSCAD_Import_Tool.exe
+    name: Build on Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13.5'
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Create Executable
+        shell: cmd
+        run: |
+          python -m venv .
+          Scripts\activate.bat
+          Scripts\python.exe -m pip install --upgrade setuptools
+          Scripts\python.exe -m pip install pyinstaller
+          Scripts\python.exe -m pip install "twisted[tls]" appnope requests certifi
+          Scripts\python.exe -m pip install -r requirements.txt
+          Scripts\pyinstaller.exe --onefile --add-data "finterface_pscad.f90.tmpl;." IEC_DLL_PSCAD_Import_Tool.py
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: IEC_DLL_PSCAD_Import_Tool
+          path: dist/IEC_DLL_PSCAD_Import_Tool.exe
 
   deploy:
     name: Push builds
-    runs-on: ubuntu-20.04
-    needs: [windows]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Download WINDOWS artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: IEC_DLL_PSCAD_Import_Tool.exe
+    runs-on: ubuntu-latest
+    needs: windows
 
-      - name: Upload WINDOWS binaries to release
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: IEC_DLL_PSCAD_Import_Tool
+
+      - name: Check downloaded files
+        run: ls -la
+
+      - name: Upload Windows binary to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
