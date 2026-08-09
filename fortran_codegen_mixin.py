@@ -166,9 +166,9 @@ class FortranCodegenMixin:
                 idx += 1
         return buffer
 
-    @staticmethod
     def generate_storf_outputs_to_pscad(
-            names: list, widths: list, pscad_suffix: str, indent: str = '\t'
+            self, names: list, widths: list, pscad_suffix: str,
+            indent: str = '\t'
     ) -> str:
         """
             Generate assignments from STORF back to PSCAD output variables.
@@ -188,7 +188,7 @@ class FortranCodegenMixin:
         idx = 0
         for name, width in zip(names, widths):
             for j in range(1, width + 1):
-                part1 = _indexed_pscad_name(name, pscad_suffix, j, width)
+                part1 = self._indexed_pscad_name(name, pscad_suffix, j, width)
                 buffer += f'{indent}{part1} = STORF(idx_start_outputs + {idx})\n'
                 idx += 1
         return buffer
@@ -232,30 +232,31 @@ class FortranCodegenMixin:
 
             Creates the Fortran declarations for input, parameter, output
             initialization and output variables by combining the individual
-            declaration blocks produced by generate_variables_declaration().
+            declaration blocks produced by
+            self.generate_variables_declaration().
 
             :return: **-** (str) – Fortran declaration block.
         """
         blocks = [
-            generate_variables_declaration(
+            self.generate_variables_declaration(
                 intent_value='IN',
                 var_names=self.in_names,
                 var_suffix='_pscad',
                 var_types=self.in_pscad_types,
                 var_width=self.in_width),
-            generate_variables_declaration(
+            self.generate_variables_declaration(
                 intent_value='IN',
                 var_names=self.param_names,
                 var_suffix='_pscad',
                 var_types=self.param_pscad_types,
                 var_width=None),
-            generate_variables_declaration(
+            self.generate_variables_declaration(
                 intent_value='IN',
                 var_names=self.out_init_names,
                 var_suffix='_pscad',
                 var_types=self.out_init_pscad_types,
                 var_width=self.out_init_width),
-            generate_variables_declaration(
+            self.generate_variables_declaration(
                 intent_value='OUT',
                 var_names=self.out_names,
                 var_suffix='_pscad',
@@ -279,7 +280,7 @@ class FortranCodegenMixin:
             width = self.in_width[i]
             name = self.in_names[i]
             for j in range(1, width + 1):
-                part1 = _indexed_pscad_name(
+                part1 = self._indexed_pscad_name(
                     name=name,
                     suffix='_pscad_prev',
                     j=j,
@@ -305,7 +306,7 @@ class FortranCodegenMixin:
             width = self.in_width[i]
             name = self.in_names[i]
             for j in range(1, width + 1):
-                part2 = _indexed_pscad_name(
+                part2 = self._indexed_pscad_name(
                     name=name,
                     suffix='_pscad',
                     j=j,
@@ -352,7 +353,7 @@ class FortranCodegenMixin:
         for i, name in enumerate(names):
             width = widths[i] if widths is not None else 1
             for j in range(1, width + 1):
-                part2 = _indexed_pscad_name(
+                part2 = self._indexed_pscad_name(
                     name=name,
                     suffix=pscad_suffix,
                     j=j,
@@ -428,7 +429,7 @@ class FortranCodegenMixin:
         with open(template_path, 'r', encoding='utf-8') as f:
             template = Template(f.read())
 
-        in_pscad_prev_declaration = generate_variables_declaration(
+        in_pscad_prev_declaration = self.generate_variables_declaration(
             intent_value='',
             var_names=self.in_names,
             var_suffix='_pscad_prev',
@@ -460,14 +461,14 @@ class FortranCodegenMixin:
             indent='\t\t\t'
         )
 
-        exty_to_storf = generate_flat_array_to_storf_outputs(
+        exty_to_storf = self.generate_flat_array_to_storf_outputs(
             widths=self.out_width,
             pscad_types=self.out_pscad_types,
             array_name='ExtY',
             indent='\t\t'
         )
 
-        storf_outputs_to_pscad = generate_storf_outputs_to_pscad(
+        storf_outputs_to_pscad = self.generate_storf_outputs_to_pscad(
             names=self.out_names,
             widths=self.out_width,
             pscad_suffix='_pscad',
