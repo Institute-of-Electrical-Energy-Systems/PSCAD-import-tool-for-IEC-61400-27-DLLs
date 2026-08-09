@@ -50,11 +50,6 @@ jobs:
         with:
           name: IEC_DLL_PSCAD_Import_Tool.exe
 
-      - name: GET VERSION
-        run: |
-          VERSION=$(python setup.py --version)
-          echo "VERSION=v$VERSION" >> $GITHUB_ENV
-
       - name: Upload WINDOWS binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
