@@ -42,21 +42,24 @@ jobs:
   deploy:
     name: Push builds
     runs-on: ubuntu-latest
-    needs: windows
-
+    needs: [windows]
+  
     permissions:
       contents: write
-
+  
     steps:
-      - name: Download Windows artifact
+      - name: Checkout
+        uses: actions/checkout@v4
+  
+      - name: Download WINDOWS artifact
         uses: actions/download-artifact@v5
         with:
           name: IEC_DLL_PSCAD_Import_Tool
-
+  
       - name: Check downloaded files
         run: ls -la
-
-      - name: Upload Windows binary to release
+  
+      - name: Upload WINDOWS binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
