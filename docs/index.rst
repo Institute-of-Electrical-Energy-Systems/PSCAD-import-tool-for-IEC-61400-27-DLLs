@@ -145,7 +145,7 @@ characteristics is generated (`PscadProjectMixin._add_ports` /
 
 - A mask ("Mask") with three tabs:
 
-    - `Configuration` <br />
+    - `Configuration` :raw-html:`<br />`
       Contains the (editable) path to the DLL (`DLL_Path`) as well as the `Use_Interpolation` option for linear interpolation of the inputs – relevant if the time step of the DLL model differs from the PSCAD simulation.
 
     ..  figure:: ../images/Figure2b.png
@@ -153,7 +153,7 @@ characteristics is generated (`PscadProjectMixin._add_ports` /
     
         Configuration menu of the PSCAD component of the imported DLL.
 
-    - `Model Parameters` <br />
+    - `Model Parameters` :raw-html:`<br />`
       All numerical model parameters of the DLL with name, description, unit, default, minimum, and maximum value. 
       String parameters (`CHARACTER(*)`) are not supported here because the Ext-SimEnv C API only allows numerical values in its flat parameter array; the tool displays a warning in this case.
 
@@ -162,7 +162,7 @@ characteristics is generated (`PscadProjectMixin._add_ports` /
     
         Model parameters menu of the PSCAD component of the imported DLL.
 
-    - `Initial Conditions` <br />
+    - `Initial Conditions` :raw-html:`<br />`
       `TRelease` (time in seconds until which the model is held at its initial conditions) as well as one initial value per output signal (`<signal>_init`).
 
     ..  figure:: ../images/Figure2d.png
