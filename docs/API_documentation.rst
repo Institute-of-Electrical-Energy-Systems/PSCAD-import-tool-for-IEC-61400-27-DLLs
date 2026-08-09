@@ -33,7 +33,16 @@ IEC_DLL_PSCAD_Import_Tool.py
 
 IEC_DLLInterface.py
 ^^^^^^^^^^^^^^^^^^^
-.. automodule:: IEC_DLLInterface
+.. autoclass:: IEC_DLLInterface.StaticESEInputSignal
+   :members:
+   :show-inheritance:
+.. autoclass:: IEC_DLLInterface.StaticESEOutputSignal
+   :members:
+   :show-inheritance:
+.. autoclass:: IEC_DLLInterface.StaticESEParameter
+   :members:
+   :show-inheritance:
+.. autoclass:: IEC_DLLInterface.StaticExtSimEnvCapi
    :members:
    :show-inheritance:
 
